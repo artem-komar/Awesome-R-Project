@@ -21,3 +21,17 @@ All work is done in R with descriptive statistics: means, medians, correlations,
 - **KAST** - % of rounds where player got a Kill, Assist, Survived or was Traded
 - **Tier** - level of the tournament (Tier 1 is the biggest ones)
 - **CV** - how uneven is ADR inside the team (in %)
+
+## Ideas
+Let's move to the ideas that we apply to our project:
+
+### Impact of individual performance (ADR / KAST) on the game result
+**Question:** Do players with high ADR really win the maps?
+>For those who doesn't know: ADR is how much damage a player does in one round on average, so team ADR is just the average of 5 players. We will count it for both teams on every map and compare it with the round difference (`score1_game - score2_game`), to see does the team with bigger ADR really win by more rounds. Also we look for "anomaly" maps, where the winner had lower ADR than the opponent.**
+
+**How we will realize that:**
+- count mean ADR of each team on the map (average of 5 players)
+- count round difference: `score1_game - score2_game`
+- build linear regression: round difference depends on the difference of mean ADR of two teams
+- look at "anomaly" maps, where the winner had lower ADR than the opponent
+
