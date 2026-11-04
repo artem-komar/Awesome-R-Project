@@ -1,3 +1,4 @@
+library(here)
 ## Idea 4. Solo carry vs team balance
 # only maps where both teams have 5 players, like in idea 1
 # win is from team_maps, team1_win is not reliable
@@ -113,10 +114,8 @@ regulars |> arrange(kast_resid) |> head(10) |> select(nickname, n_maps, adr_mean
 ggplot(regulars, aes(x = adr_mean, y = kast_mean)) +
   geom_point(aes(color = type), alpha = 0.7, size = 2) +
   geom_smooth(method = "lm", color = "black", se = FALSE) +
-  scale_color_manual(values = c("high KAST for its ADR" = "#109856",
-                                "typical" = "grey70",
-                                "low KAST for its ADR" = "#d65a2a"),
-                     name = NULL) +
+  scale_color_manual(values = c("high KAST for its ADR" = "#109856","typical" = "grey70",
+"low KAST for its ADR" = "#d65a2a"), name = NULL) +
   labs(title = "Player types: ADR (aggression) vs KAST (stability)",
        subtitle = "Average per player, only players with 30+ maps",
        x = "Mean ADR", y = "Mean KAST, %",
@@ -126,3 +125,10 @@ ggplot(regulars, aes(x = adr_mean, y = kast_mean)) +
 ##AI assisted with Recommending linear model residuals (resid(lm())) and 1 SD thresholds to classify player archetypes without k-means, also
 # suggesting arrange() and head(10) logic to isolate top positive/negative outlier players and 
 #advising to place color mapping inside geom_point() instead of global aes() to keep a single geom_smooth() regression line.
+# Збереження графіків для Ідеї 4
+ggsave(here('Output', 'Idea4.png'), width = 10, height = 6, dpi = 300)
+ggsave(here('Output', 'Idea4.1.png'), width = 10, height = 6, dpi = 300)
+
+# Збереження графіків для Ідеї 6
+ggsave(here('Output', 'Idea6.png'), width = 10, height = 6, dpi = 300)
+ggsave(here('Output', 'Idea6.1.png'), width = 10, height = 6, dpi = 300)
