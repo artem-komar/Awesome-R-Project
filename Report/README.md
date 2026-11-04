@@ -54,7 +54,20 @@ Let's move to the ideas that we apply to our project:
 **Tools:**
 
 
+### 3) First map advantage and comeback rate (BO3 matches)
 
+**Question:** Does winning the first map guarantee winning the match, and how often do teams make a comeback?
+
+> For those who don't know: In CS2, most official matches are played as a Best-of-3 (BO3) series, where the first team to win 2 maps wins the match. Winning the 1st map creates psychological momentum and puts pressure on the opponent. We want to check if there is a strong "first map syndrome" (where map 1 winners almost always win the series), how often a team can turn the game around (comeback 2:1), and whether comeback rates differ across tournament tiers.
+
+**How we will realize that:**
+* filter only valid BO3 matches (bo3_ok == TRUE) with recorded first map outcomes
+* calculate the overall first map win-to-match conversion rate and comeback rate (%)
+* group matches by tournament tier (tier) to see if higher-tier teams allow fewer comebacks
+* count exact final score distributions (score1_match, score2_match) for comeback matches
+* reshape summary data (pivot_longer) and build column charts (geom_col) to visually compare outcomes and tier differences
+
+**Tools:** dplyr (filter(), group_by(), summarise(), count(), select()), tidyr (pivot_longer() for reshaping overall summary rates into plot format), ggplot2 (geom_col(), geom_text())
 
 ---
 
