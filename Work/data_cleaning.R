@@ -125,3 +125,42 @@ players <- players |> mutate(
                    substr(name, nchar(name) - 1, nchar(name)), NA))
 #AI created the regex pattern and we broke column name into nickname and nationality
 nrow(players)
+
+#now maps is the table of all maps from each tournament
+#one map one tournament one match one pair of a teams fighting
+#For certain ideas we need a table which will have a grain 
+#one team on a one map 
+
+team_maps <- players |> group_by(
+  match_id, game_id, tournament, tier, datetime, map_name,
+  team, opponent
+) |> summarise(
+  n_players = n(),
+  adr_mean = mean(adr),
+  adr_sd = sd(adr),
+  kast_ean = mean(kast),
+  rounds_won = first(rounds_won),
+  rounds_lost = first(rounds_lost),
+  win = first(win)
+) |> ungroup()
+
+#we are adding full team check for further more fair evaluation of results
+team_maps <- team_maps |> mutate(
+  adr_cv = adr_sd / adr_mean * 100,
+  round_diff = rounds_won - rounds_lost,
+  full_team = (n_players == 5)
+)
+#We are creating a mirror table for opponents
+opp <- team_maps |> 
+  select(game_id, opponent = team, opp_adr_mean = adr_mean,
+         opp_full_team = full_team)
+sample(opp)
+team_maps <- team_maps |> left_join(
+  opp, by = c('game_id', 'opponent')
+)
+#Now we have one row - team and its opponent with their parameters
+#So we can calculate diff per 
+
+team_maps <- team_maps |> mutate(
+  adr_diff = adr_mean - opp_adr_mean,
+  both_full = full_team & opp_full_team)
