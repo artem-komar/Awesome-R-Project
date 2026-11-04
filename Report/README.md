@@ -35,10 +35,46 @@ Let's move to the ideas that we apply to our project:
 - build linear regression: round difference depends on the difference of mean ADR of two teams
 - look at "anomaly" maps, where the winner had lower ADR than the opponent
 
- **Formula:**
+**Formula:**
 
- 
 **Tools:**
 
 **Status:**
+
+---
+
+### Map balance and popularity by tournament tier (Tier 1/2/3)
+
+**Question:** Which maps are played the most and is it the same in every tier?
+
+**What we do:**
+- count pick rate of every map inside each tier: games on the map / all games in the tier * 100%
+- count total rounds in the game: `score1_game + score2_game`
+- count overtime rate for every map: games with more than 24 rounds / all games on the map * 100%
+  
+**Tools:**
+  
+**Status:**
+
+---
+
+### Solo carry vs team balance (ADR variance inside the team)
+
+**Question:** Team wins because of one star player or because everybody plays even?
+
+**What we do:**
+- count SD of ADR of 5 players inside the team on one map
+- count CV = SD / mean ADR * 100%, so we can compare teams with different ADR
+- use only maps where both teams have all 5 players
+- compare winner and loser of the same map (who has lower CV)
+- check is it stronger when the win was bigger (groups by round difference)
+
+**Why CV and not only SD:** winners have higher ADR, so their SD is bigger just because of this.
+
+**Tools:**
+  
+**Status:**
+
+ 
+
 
