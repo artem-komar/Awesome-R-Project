@@ -7,6 +7,8 @@ cs <- read.csv(here("data", "cs2_all_tiers_games.csv"), encoding = "UTF-8", na.s
 t1 <- read.csv(here("data", "cs2_tier1_games.csv"), na.strings = c("", "NA"))
 t2 <- read.csv(here("data", "cs2_tier2_games.csv"), na.strings = c("", "NA"))
 
+nrow(cs) #23888 rows before cleaning, 21486 after
+
 # Tiers of tournaments
 tier1_list <- unique(t1$tournament)
 tier2_list <- unique(t2$tournament)

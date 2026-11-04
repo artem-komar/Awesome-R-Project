@@ -26,48 +26,48 @@ All work is done in R with descriptive statistics: means, medians, correlations,
 Let's move to the ideas that we apply to our project:
 
 ### 1) Impact of individual performance (ADR / KAST) on the game result
-**Question:** Do players with high ADR really win the maps?
+**Question:** Do high ADR really wins the maps?
 >For those who doesn't know: ADR is how much damage a player does in one round on average, so team ADR is just the average of 5 players. We will count it for both teams on every map and compare it with the round difference (`score1_game - score2_game`), to see does the team with bigger ADR really win by more rounds. Also we look for "anomaly" maps, where the winner had lower ADR than the opponent.**
 
 **How we will realize that:**
 - count mean ADR of each team on the map (average of 5 players)
-- count round difference: `score1_game - score2_game`
-- build linear regression: round difference depends on the difference of mean ADR of two teams
+- count round difference: `round_diff = rounds_won - rounds_lost`
+- compute the adr diff between winner and loser
+- flag anomaly maps where adr<0
+- build the relation between share of the anomalies/adr difference and round difference
 - look at "anomaly" maps, where the winner had lower ADR than the opponent
 
 **Formula:**
-
+Mean ADR: 0.2 * SUM(ADRi)
+Round diff: round_won - round_lost (from the winner's perspective)
+ADR diff: mean(ADR)winner - mean(ADR)loser
+Anomaly: ADR diff < 0
 **Tools:**
-
-
+tidyr: pivot_longer()
+dplyr: group_by() + summarise() (team averages), left_join() (attach opponent’s ADR), mutate() (adr_diff, anomaly), filter() (both_full, win == 1)
+base R: mean() (anomaly share), which.min() (extreme cases)
+ggplot2: geom_jitter() + geom_vline() (scatter of ADR difference vs round difference), geom_col() + geom_text() (anomaly share by round difference)
 ---
 
 ### 2)Map balance and popularity by tournament tier (Tier 1/2/3)
 
-**Question:** Which maps are played the most and is it the same in every tier?
+**Question:** Which maps are played the most?
 
 **Our task:**
-- count pick rate of every map inside each tier: games on the map / all games in the tier * 100%
-- count total rounds in the game: `score1_game + score2_game`
-- count overtime rate for every map: games with more than 24 rounds / all games on the map * 100%
-  
+- extract the quarter of each map from its date (e.g. 2025Q3)
+- count how many times each map was played in each quarter
+- fill in zeros for maps that were not played in a quarter (map out of the pool)
+- compute each map’s share of all maps played in that quarter
+- visualize how the map pool changes over time (heatmap: quarter × map)
+
+**Formula:**
+Quarter: (month-1)/3 + 1
+Map share: Ni / sum(N) * 100%
 **Tools:**
-
-
-### 3) First map advantage and comeback rate (BO3 matches)
-
-**Question:** Does winning the first map guarantee winning the match, and how often do teams make a comeback?
-
-> For those who don't know: In CS2, most official matches are played as a Best-of-3 (BO3) series, where the first team to win 2 maps wins the match. Winning the 1st map creates psychological momentum and puts pressure on the opponent. We want to check if there is a strong "first map syndrome" (where map 1 winners almost always win the series), how often a team can turn the game around (comeback 2:1), and whether comeback rates differ across tournament tiers.
-
-**How we will realize that:**
-* filter only valid BO3 matches (bo3_ok == TRUE) with recorded first map outcomes
-* calculate the overall first map win-to-match conversion rate and comeback rate (%)
-* group matches by tournament tier (tier) to see if higher-tier teams allow fewer comebacks
-* count exact final score distributions (score1_match, score2_match) for comeback matches
-* reshape summary data (pivot_longer) and build column charts (geom_col) to visually compare outcomes and tier differences
-
-**Tools:** dplyr (filter(), group_by(), summarise(), count(), select()), tidyr (pivot_longer() for reshaping overall summary rates into plot format), ggplot2 (geom_col(), geom_text())
+base R: format(), as.numeric(), %/%, paste0() to build the quarter label
+dplyr: filter() (drop maps without a name), count() (games per quarter and map), group_by() + mutate() (share within each quarter)
+tidyr: complete() (add zero rows for maps absent from the pool)
+ggplot2: geom_tile() + geom_text() + scale_fill_gradient() (heatmap of map shares by quarter)
 
 ---
 
@@ -85,6 +85,17 @@ Let's move to the ideas that we apply to our project:
 **Why CV and not only SD:** winners have higher ADR, so their SD is bigger just because of this.
 
 **Tools:** `dplyr` (`filter()`, `group_by()`, `summarise()`, `inner_join()`), `ggplot2` (`geom_density()`, `geom_col()`), `stats` (`t.test()` paired)
+  
+### 5) How Ukraine is represented in the sport
+
+**Question:** IVAN PUT HERE
+
+**Our task:**
+ IVAN HERE
+
+**Why CV and not only SD:** IVAN HERE
+
+**Tools:** IVAN HERE
   
 
 
