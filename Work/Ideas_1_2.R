@@ -231,7 +231,7 @@ anomaly_maps[which.min(anomaly_maps$adr_diff), ]
 nrow(anomaly_maps)
 
 #The jitter plot
-ggplot(anomaly_maps, aes(
+idea1.1 <- ggplot(anomaly_maps, aes(
   x = adr_diff, y =round_diff, color = anomaly
 )) +geom_jitter(alpha = 0.1, size = 2, shape = 'square') +
   geom_vline(xintercept = 0) + labs(
@@ -250,7 +250,7 @@ by_diff <- anomaly_maps |> mutate(
 ) |> group_by(diff_group) |> 
   summarize(maps_n = n(), anomaly_share = mean(anomaly)*100)
 by_diff$diff_group <- factor(by_diff$diff_group, levels = c("2", "3", "4", "5", "6", "7", "8+"))
-by_diff |> ggplot(aes(
+idea1.2 <- by_diff |> ggplot(aes(
   x = diff_group, y = anomaly_share
 )) + geom_col(fill = '#50C878', width = 0.7) +
   geom_text(aes(label = paste(round(anomaly_share, 2), "%")),
@@ -281,7 +281,7 @@ mappool <- maps |>
 # I have revised the work this function does and implemented it
 
 #Tile plot
-mappool |> ggplot(aes(
+idea2 <- mappool |> ggplot(aes(
   x = quarter, y = map_name, fill = share
 )) + geom_tile(color = 'white', linewidth = 0.2) + 
   geom_text(aes(label = ifelse(share != 0, round(share, 0), '')), size = 3) + 
