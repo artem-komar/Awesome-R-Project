@@ -67,3 +67,61 @@ cs$datetime <- as.POSIXct(cs$datetime, format = "%Y-%m-%d %H:%M:%S", tz = "UTC")
 cs <- cs[cs$datetime >= as.POSIXct("2023-10-01", tz = "UTC"), ]
 #AI helped to find the R function for datetime
 nrow(cs)
+#DIVISION into matches and maps
+matches <- cs[cs$is_total == "True",]
+maps <- cs[cs$is_total == "False",]
+nrow(matches)
+nrow(maps)
+
+mean(matches$team1_win)
+#Team1 win has only 10% the result is flawed, worth recalculating
+matches$team1_won <- ifelse(matches$score1_match > matches$score2_match, 1, 0)
+mean(matches$team1_won)
+
+sum(is.na(maps$score1_game) | is.na(maps$score2_game))
+sum(!pmax(maps$score1_game, maps$score2_game) >= 13, na.rm = T)
+#There are missing scores or technical wins (less than 13 rounds were played)
+#Let`s delete them
+maps <- maps[!is.na(maps$score1_game) & !is.na(maps$score2_game) & 
+               pmax(maps$score1_game, maps$score2_game) >= 13, ]
+
+#PIVOT LONGER: players (one row - one player on a map)
+wide <- maps
+#lets find columns where we can substract certain parameters from (AI suggested the pattern)
+name_cols <- grep("^team\\d_player\\d$", names(wide))
+#Adding name because in future we will substract certain parameters from here
+#Leaving only name
+names(wide)[name_cols] <- paste0(names(wide)[name_cols],'_name')
+names(wide)[name_cols]
+
+wide <- wide |> select(
+  match_id, game_id, tournament, tier, datetime, map_name, team1,
+  team2, score1_game, score2_game,
+  starts_with('team1_player'), starts_with('team2_player')
+)
+glimpse(wide)
+#Converting to players
+players <- wide |> pivot_longer(
+  cols = starts_with(c("team1_player", 'team2_player')),
+  names_to = c('side' , 'slot', '.value'),
+  names_pattern = 'team(.)_player(.)_(.*)'
+)
+#AI suggested the pattern with () and .value feature
+# + corrected syntaxis
+
+
+players <- players |> mutate(
+  team = ifelse(side == '1', team1, team2),
+  opponent = ifelse(side == '1', team2, team1),
+  rounds_won = ifelse(side == '1', score1_game, score2_game),
+  rounds_lost = ifelse(side == '1', score2_game, score1_game),
+  win = ifelse(rounds_won > rounds_lost, 1, 0)
+)
+
+#we need to differentiate a nickname and a nationality based on patterns in a name column
+players <- players |> mutate(
+  nickname = trimws(sub("\\(.*|,.*", "", name)),
+  country = ifelse(grepl(", [A-Z]{2}$", name),
+                   substr(name, nchar(name) - 1, nchar(name)), NA))
+#AI created the regex pattern and we broke column name into nickname and nationality
+nrow(players)
