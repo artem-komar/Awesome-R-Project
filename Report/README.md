@@ -42,11 +42,13 @@ Mean ADR: 0.2 * SUM(ADRi)
 Round diff: round_won - round_lost (from the winner's perspective)
 ADR diff: mean(ADR)winner - mean(ADR)loser
 Anomaly: ADR diff < 0
+
 **Tools:**
 tidyr: pivot_longer()
 dplyr: group_by() + summarise() (team averages), left_join() (attach opponent’s ADR), mutate() (adr_diff, anomaly), filter() (both_full, win == 1)
 base R: mean() (anomaly share), which.min() (extreme cases)
 ggplot2: geom_jitter() + geom_vline() (scatter of ADR difference vs round difference), geom_col() + geom_text() (anomaly share by round difference)
+
 ---
 
 ### 2)Map balance and popularity by tournament tier (Tier 1/2/3)
@@ -63,14 +65,15 @@ ggplot2: geom_jitter() + geom_vline() (scatter of ADR difference vs round differ
 **Formula;**
 Quarter: (month-1)/3 + 1
 Map share: Ni / sum(N) * 100%
+
 **Tools:**
-<<<<<<< HEAD
+
 base R: format(), as.numeric(), %/%, paste0() to build the quarter label
 dplyr: filter() (drop maps without a name), count() (games per quarter and map), group_by() + mutate() (share within each quarter)
 tidyr: complete() (add zero rows for maps absent from the pool)
 ggplot2: geom_tile() + geom_text() + scale_fill_gradient() (heatmap of map shares by quarter)
-=======
 
+---
 
 ### 3) First map advantage and comeback rate (BO3 matches)
 
@@ -108,7 +111,7 @@ ggplot2: geom_tile() + geom_text() + scale_fill_gradient() (heatmap of map share
 
 
  ---
-###6) Role clustering: correlation between ADR (aggression) and KAST (stability)
+### 6) Role clustering: correlation between ADR (aggression) and KAST (stability)
 
 **Question:** Do aggressive players (high ADR) also play stable (high KAST)?
 
