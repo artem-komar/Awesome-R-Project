@@ -42,13 +42,11 @@ Mean ADR: 0.2 * SUM(ADRi)
 Round diff: round_won - round_lost (from the winner's perspective)
 ADR diff: mean(ADR)winner - mean(ADR)loser
 Anomaly: ADR diff < 0
-
 **Tools:**
 tidyr: pivot_longer()
 dplyr: group_by() + summarise() (team averages), left_join() (attach opponent’s ADR), mutate() (adr_diff, anomaly), filter() (both_full, win == 1)
 base R: mean() (anomaly share), which.min() (extreme cases)
 ggplot2: geom_jitter() + geom_vline() (scatter of ADR difference vs round difference), geom_col() + geom_text() (anomaly share by round difference)
-
 ---
 
 ### 2)Map balance and popularity by tournament tier (Tier 1/2/3)
@@ -62,34 +60,14 @@ ggplot2: geom_jitter() + geom_vline() (scatter of ADR difference vs round differ
 - compute each map’s share of all maps played in that quarter
 - visualize how the map pool changes over time (heatmap: quarter × map)
 
-**Formula;**
+**Formula:**
 Quarter: (month-1)/3 + 1
 Map share: Ni / sum(N) * 100%
-
 **Tools:**
-
 base R: format(), as.numeric(), %/%, paste0() to build the quarter label
 dplyr: filter() (drop maps without a name), count() (games per quarter and map), group_by() + mutate() (share within each quarter)
 tidyr: complete() (add zero rows for maps absent from the pool)
 ggplot2: geom_tile() + geom_text() + scale_fill_gradient() (heatmap of map shares by quarter)
-
----
-
-### 3) First map advantage and comeback rate (BO3 matches)
-
-**Question:** Does winning the first map guarantee winning the match, and how often do teams make a comeback?
-
-> For those who don't know: In CS2, most official matches are played as a Best-of-3 (BO3) series, where the first team to win 2 maps wins the match. Winning the 1st map creates psychological momentum and puts pressure on the opponent. We want to check if there is a strong "first map syndrome" (where map 1 winners almost always win the series), how often a team can turn the game around (comeback 2:1), and whether comeback rates differ across tournament tiers.
-
-**How we will realize that:**
-* filter only valid BO3 matches (bo3_ok == TRUE) with recorded first map outcomes
-* calculate the overall first map win-to-match conversion rate and comeback rate (%)
-* group matches by tournament tier (tier) to see if higher-tier teams allow fewer comebacks
-* count exact final score distributions (score1_match, score2_match) for comeback matches
-* reshape summary data (pivot_longer) and build column charts (geom_col) to visually compare outcomes and tier differences
-
-**Tools:** dplyr (filter(), group_by(), summarise(), count(), select()), tidyr (pivot_longer() for reshaping overall summary rates into plot format), ggplot2 (geom_col(), geom_text())
->>>>>>> 0338b82689c97ec46d20a16525fbaafb43a2eba6
 
 ---
 
@@ -108,10 +86,21 @@ ggplot2: geom_tile() + geom_text() + scale_fill_gradient() (heatmap of map share
 
 **Tools:** `dplyr` (`filter()`, `group_by()`, `summarise()`, `inner_join()`), `ggplot2` (`geom_density()`, `geom_col()`), `stats` (`t.test()` paired)
   
+### 5) How Ukraine is represented in the sport
+
+**Question:** IVAN PUT HERE
+
+**Our task:**
+ IVAN HERE
+
+**Why CV and not only SD:** IVAN HERE
+
+**Tools:** IVAN HERE
+  
 
 
  ---
-### 6) Role clustering: correlation between ADR (aggression) and KAST (stability)
+###6) Role clustering: correlation between ADR (aggression) and KAST (stability)
 
 **Question:** Do aggressive players (high ADR) also play stable (high KAST)?
 
