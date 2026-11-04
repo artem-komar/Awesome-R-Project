@@ -1,5 +1,4 @@
 library(tidyverse)
-install.packages("ggthemes")
 library(ggthemes)
 library(here)
 
@@ -73,6 +72,15 @@ maps <- cs[cs$is_total == "False",]
 nrow(matches)
 nrow(maps)
 
+#Deduplication of rows
+#We sort them by id first to group those with similar id,
+#then we sort by map_name so that without map name would be first
+#and will be dleted by !duplicate
+#only those without map name are true summaries
+matches <- matches[order(matches$match_id, !is.na(matches$map_name),]
+matches <- matches[!duplicated(matches$match_id),]
+nrow(matches)
+
 mean(matches$team1_win)
 #Team1 win has only 10% the result is flawed, worth recalculating
 matches$team1_won <- ifelse(matches$score1_match > matches$score2_match, 1, 0)
@@ -143,7 +151,7 @@ team_maps <- players |> group_by(
   rounds_lost = first(rounds_lost),
   win = first(win)
 ) |> ungroup()
-
+#AI assisted (syntaxis, column choice)
 #we are adding full team check for further more fair evaluation of results
 team_maps <- team_maps |> mutate(
   adr_cv = adr_sd / adr_mean * 100,
@@ -164,3 +172,48 @@ team_maps <- team_maps |> left_join(
 team_maps <- team_maps |> mutate(
   adr_diff = adr_mean - opp_adr_mean,
   both_full = full_team & opp_full_team)
+
+
+# Numerating maps + its amount
+# For 'comeback' evaluations we ought to number the maps first
+# sort of: partition by map row_number
+
+maps <- maps |> arrange(match_id, game_id) |> 
+  group_by(match_id) |> mutate(
+    map_no = row_number(),
+    n_maps = n()
+  ) |> ungroup()
+
+#We need to see who won the map
+maps <- maps |> 
+  mutate(map_winner = ifelse(score1_game > score2_game, team1, team2))
+maps$map_winner
+
+map1 <- maps |> filter(map_no == 1) |> 
+  select(match_id, n_maps, map1_winner = map_winner)
+map2 <- maps |> filter(map_no == 2) |> 
+  select(match_id, map2_winner = map_winner)
+#AI assisted(column choice)
+matches <- matches |> 
+  left_join(map1, by = 'match_id') |> 
+  left_join(map2, by = 'match_id')
+
+
+#We need to validate that there are not 2 maps won in a row by one team 
+#Because that is not a comeback
+#We need to verify that it is a bo3
+#And that map is complete (not a technical win)
+#AI suggested what columns to look for
+matches <- matches |> mutate(
+  match_winner = ifelse(score1_match>score2_match, team1, team2),
+  maps_complete = !is.na(n_maps) & n_maps == score1_match + score2_match,
+  order_ok = !(n_maps == 3 & map1_winner == map2_winner),
+  bo3_ok = maps_complete & order_ok & bestOf == 3 &
+    pmax(score1_match, score2_match) == 2,
+  map1_winner_won = map1_winner == match_winner)
+
+
+nrow(matches)
+nrow(maps)
+nrow(players)
+nrow(team_maps)
