@@ -234,16 +234,18 @@ nrow(anomaly_maps)
 #The jitter plot
 idea1.1 <- ggplot(anomaly_maps, aes(
   x = adr_diff, y =round_diff, color = anomaly
-)) +geom_jitter(alpha = 0.1, size = 2, shape = 'square') +
-  geom_vline(xintercept = 0) + labs(
-    title = 'Winner had higher ADR", "Winner had lower ADR (anomaly)',
-    color = NULL,
+)) +geom_jitter(alpha = 0.3, size = 2, shape = 'square') +
+  geom_vline(xintercept = 0) + scale_color_manual(
+    values = c("FALSE" = "#2a78d6", "TRUE" = "#50C878"),
+    labels = c("Winner had higher ADR", "Winner had lower ADR (anomaly)")) + 
+  labs(
+    title = "ADR difference vs round difference",
     x = 'ADR difference',
-    y = 'ROUND difference',
+    y = 'ROUND difference'
   ) + theme_minimal() + theme(
-    legend.position = 'none'
+    legend.position = 'bottom'
   )
-
+#SLIDE 7 
 #lets divide the difference in rounds into different values 
 #to create proper histogram
 by_diff <- anomaly_maps |> mutate(
@@ -263,10 +265,11 @@ idea1.2 <- by_diff |> ggplot(aes(
               axis.title = element_text(face = 'bold'),
               plot.caption = element_text(face = 'italic')
             )
+#SLIDE 7
 #AI suggested adding by diff df to show the amount of maps with different round diffs
 #I have created the plot
-ggsave(here('Output', 'Idea1.1.png'), idea1.1, width = 10, height = 6, dpi = 300)
-ggsave(here('Output', 'Idea1.2.png'), idea1.2, width = 10, height = 6, dpi = 300)
+ggsave(here('Output', 'Idea1.1.png'), idea1.1, width = 6, height = 6, dpi = 300)
+ggsave(here('Output', 'Idea1.2.png'), idea1.2, width = 6, height = 6, dpi = 300)
 
 ## IDEA 2 ----
 maps <- maps |> mutate(
@@ -288,4 +291,5 @@ idea2 <- mappool |> ggplot(aes(
 )) + geom_tile(color = 'white', linewidth = 0.2) + 
   geom_text(aes(label = ifelse(share != 0, round(share, 0), '')), size = 3) + 
   scale_fill_gradient(low = '#f9f0ec', high = '#50C878') + theme_minimal() + labs(title = "CS2 map pool by quarter", x = NULL, y = NULL)
-ggsave(here('Output', 'Idea2.png'), idea2, width = 10, height = 6, dpi = 300)
+ggsave(here('Output', 'Idea2.png'), idea2, width = 6, height = 6, dpi = 300)
+#SLIDE 5
