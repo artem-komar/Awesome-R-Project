@@ -222,7 +222,12 @@ nrow(maps)
 nrow(players)
 nrow(team_maps)
 
-## Idea 4. Solo carry vs team balance
+
+#==============================================================================
+#==============================================================================
+#==============================================================================
+
+## Idea 4. Solo carry vs team balance(slide 8 in presentation)
 # only maps where both teams have 5 players, like in idea 1
 # win is from team_maps, team1_win is not reliable
 balance <- team_maps |> filter(both_full)
@@ -286,7 +291,11 @@ ggsave(here('Output', 'Idea4.1.png'), plot = p4_1, width = 10, height = 6, dpi =
 ##suggested adding a dashed baseline at y = 50% (geom_hline) 
 ## to visually benchmark the results against a neutral 50/50 chance.
 
-## IDEA 6. 
+#==============================================================================
+#==============================================================================
+#==============================================================================
+## IDEA 6(slide 9 in presentation)
+
 #ADR (aggression) vs KAST (stability)
 # players is already one row - one player on a map
 cor(players$adr, players$kast, use = "complete.obs")
