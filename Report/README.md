@@ -88,14 +88,23 @@ ggplot2: geom_tile() + geom_text() + scale_fill_gradient() (heatmap of map share
   
 ### 5) How Ukraine is represented in the sport
 
-**Question:** IVAN PUT HERE
+**Question:** What is the dynamics and performance of Ukrainian players?
 
 **Our task:**
- IVAN HERE
+ - filter UA players which appear in >150 maps
+ - select 8 players with the highest ADR 
+ - compare their ADR with mean ADR and see the difference on the plot
+ - select tier 1 UA players
+ - count their appearance quarterly
+ - calculate the share of this appearance for all ukrainians and top 5 players and show is as area.
 
-**Why CV and not only SD:** IVAN HERE
+**Formulas:** Player mean ADR = Σ(player’s map ADR values) / number of maps played
+Reference ADR = Σ(ADR across all player-map records) / total player-map records
+ADR difference = player mean ADR − reference ADR
+Quarterly share (%) = 100 × (Tier 1 appearances by the player or group in the quarter) / (all Tier 1 appearances in the quarter)
+Total Ukrainian quarterly share (%) = Σ(top five players’ quarterly shares) + other Ukrainian players’ quarterly share
 
-**Tools:** IVAN HERE
+**Tools:** dplyr (filter(), group_by(), left_join()), tidyr (complete()), ggplot2 () geom_vline(), geom_area(),)
   
 
 

@@ -219,49 +219,73 @@ nrow(players)
 nrow(team_maps)
 
 ##
-## IDEA 5 ---- Players - countries distribution, top countries
+## IDEA 5 ---- How Ukraine is represented in the sport
 
-idea5_players <- players |>
-  filter(!is.na(id), !is.na(country))
+# Plot 5.1 top Ukrainian players by ADR
+ua_top <- players |>
+  filter(country %in% "UA") |>
+  group_by(nickname) |>
+  summarise(maps = n(), adr = mean(adr)) |>
+  filter(maps >= 150) |>
+  slice_max(adr, n = 8)
+avg_adr <- mean(players$adr)
 
-country_rep <- idea5_players |>
-  group_by(country) |>
-  summarise(n_players = n_distinct(id), n_appearances = n(), .groups = "drop") |>
-  mutate(player_share = 100 * n_players / sum(n_players),
-    appearance_share = 100 * n_appearances / sum(n_appearances)) |>
-  arrange(desc(n_players), country) |>
-  slice_head(n = 10)
+# lolipop plot
+idea5_top <- ggplot(ua_top, aes(x = adr, y = reorder(nickname, adr))) +
+  geom_vline(xintercept = avg_adr, linetype = "dashed", color = "grey40") +
+  geom_segment(aes(x = avg_adr, xend = adr, yend = reorder(nickname, adr)),
+               color = "#2a78d6", linewidth = 1) +
+  geom_point(color = "#2a78d6", size = 4) +
+  geom_text(aes(label = round(adr, 1)), hjust = -0.5, size = 4.2) +
+  scale_x_continuous(limits = c(70, 83)) +
+  labs(title = "Top Ukrainian players by ADR",
+       subtitle = "Players with 150+ maps; dashed line - average of all players",
+       x = "Average ADR", y = NULL) +
+  theme_minimal(base_size = 14) +
+  theme(panel.grid.major.y = element_blank(), panel.grid.minor = element_blank())
+#AI suggested how to make the lolipop with mean line
+# I have learned how the code for these plots works and implemented it
 
-country_rep
+ggsave(here("Output", "idea5.1.png"),   idea5_top,   width = 6, height = 5, dpi = 300, bg = "white")
 
-top_countries <- country_rep$country
 
-country_rep <- country_rep |>
-  mutate(country = factor(country, levels = rev(top_countries)))
+# Plot 5.2 quarterly Tier 1 appearances of Ukrainians
+tier1_quarters <- players |>
+  filter(tier == "tier1", 
+         datetime >= as.POSIXct("2024-01-01", tz = "UTC"),
+         datetime < as.POSIXct("2026-10-01", tz = "UTC")) |>
+  mutate(quarter = as.Date(cut(as.Date(datetime, tz = "UTC"), "quarter")))
+#AI suggested how to do quarters, I checked and done the full pipeline 
 
-# Plot 1 - Country representation
-idea5_rep_plot <- ggplot(country_rep, aes(y = country)) +
-  geom_segment(
-    aes(x = player_share, xend = appearance_share, yend = country),
-    color = "grey65", linewidth = 0.8
-  ) +
-  geom_point(aes(x = player_share, color = "Distinct players"), size = 3) +
-  geom_point(aes(x = appearance_share, color = "Player-map appearances"), size = 3) +
-  scale_color_manual(
-    values = c("Distinct players" = "#2a78d6",
-               "Player-map appearances" = "#d65a2a"),
-    breaks = c("Distinct players", "Player-map appearances"),
-    name = NULL
-  ) +
-  expand_limits(x = 0) +
-  labs(
-    title = "Who is represented in the CS2 sample?",
-    subtitle = "Top 10 country codes by number of distinct players",
-    x = "Share of records with a known country code (%)",
-    y = NULL
-  ) +
-  theme_minimal(base_size = 13) +
-  theme(legend.position = "top")
+ua_contributors <- tier1_quarters |>
+  filter(country == "UA", !is.na(id)) |>
+  group_by(id) |>
+  summarise(player = last(nickname, order_by = datetime), appearances = n(), .groups = "drop") |>
+  arrange(desc(appearances), player) |>
+  slice_head(n = 5)
 
-print(idea5_rep_plot)
+ua_quarters <- tier1_quarters |>
+  filter(country == "UA") |>
+  left_join(select(ua_contributors, id, player), by = "id") |>
+  mutate(player = coalesce(player, "Other Ukrainian players")) |>
+  count(quarter, player, name = "ua_appearances") |>
+  complete(quarter = sort(unique(tier1_quarters$quarter)), player, fill = list(ua_appearances = 0)) |>
+  left_join(count(tier1_quarters, quarter, name = "all_appearances"), by = "quarter") |>
+  mutate(share = 100 * ua_appearances / all_appearances,
+    player = factor(player, levels = c(ua_contributors$player,"Other Ukrainian players"))
+    )
+#AI suggested complete function to fill each quarter
+# I have revised the work this function does and implemented it
 
+# area plot
+idea5_area <- ggplot(ua_quarters, aes(quarter, share, fill = player)) +
+  geom_area(stat = "identity", color = "white", linewidth = 0.3) +
+  scale_fill_manual(values = c("#174A7E","#D89B19","#00897B", "#8A4FA0","#D66745", "#CBD5E1")) +
+  labs(title = "Ukraine’s Tier 1 presence by quarter",
+       subtitle = "Five most frequent Ukrainian players and the rest",
+       x = NULL, y = "Share of all Tier 1 appearances (%)", fill = NULL) +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom", panel.grid.minor = element_blank(),
+        plot.title = element_text(face = "bold"))
+
+ggsave(here("Output", "idea5.2.png"),   idea5_area,   width = 6, height = 5, dpi = 300, bg = "white")
