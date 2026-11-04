@@ -39,11 +39,10 @@ Let's move to the ideas that we apply to our project:
 
 **Tools:**
 
-**Status:**
 
 ---
 
-### Map balance and popularity by tournament tier (Tier 1/2/3)
+### 2)Map balance and popularity by tournament tier (Tier 1/2/3)
 
 **Question:** Which maps are played the most and is it the same in every tier?
 
@@ -54,12 +53,12 @@ Let's move to the ideas that we apply to our project:
   
 **Tools:**
 
-**Status:**
+
 
 
 ---
 
-### Solo carry vs team balance (ADR variance inside the team)
+### 4) Solo carry vs team balance (ADR variance inside the team)
 
 **Question:** Team wins because of one star player or because everybody plays even?
 
@@ -72,12 +71,12 @@ Let's move to the ideas that we apply to our project:
 
 **Why CV and not only SD:** winners have higher ADR, so their SD is bigger just because of this.
 
-**Tools:**
+**Tools:** `dplyr` (`filter()`, `group_by()`, `summarise()`, `inner_join()`), `ggplot2` (`geom_density()`, `geom_col()`), `stats` (`t.test()` paired)
   
-**Status:**
+
 
  ---
-### Role clustering: correlation between ADR (aggression) and KAST (stability)
+###6) Role clustering: correlation between ADR (aggression) and KAST (stability)
 
 **Question:** Do aggressive players (high ADR) also play stable (high KAST)?
 
@@ -93,9 +92,9 @@ Let's move to the ideas that we apply to our project:
 
 **Formula:** `r = Σ(ADR - mean ADR)(KAST - mean KAST) / sqrt(Σ(ADR - mean ADR)² * Σ(KAST - mean KAST)²)`
 
-**Tools:**
+**Tools:** `tidyr` (`pivot_longer()` for the table "one row = one player on the map"), `stats` (`cor()`, `cor.test()`, `lm()`), `ggplot2` (`geom_point(alpha = ...)`, `geom_smooth(method = "lm")`)
 
-**Status:**
+
 
 
 ---
