@@ -239,4 +239,29 @@ top_countries <- country_rep$country
 country_rep <- country_rep |>
   mutate(country = factor(country, levels = rev(top_countries)))
 
+# Plot 1 - Country representation
+idea5_rep_plot <- ggplot(country_rep, aes(y = country)) +
+  geom_segment(
+    aes(x = player_share, xend = appearance_share, yend = country),
+    color = "grey65", linewidth = 0.8
+  ) +
+  geom_point(aes(x = player_share, color = "Distinct players"), size = 3) +
+  geom_point(aes(x = appearance_share, color = "Player-map appearances"), size = 3) +
+  scale_color_manual(
+    values = c("Distinct players" = "#2a78d6",
+               "Player-map appearances" = "#d65a2a"),
+    breaks = c("Distinct players", "Player-map appearances"),
+    name = NULL
+  ) +
+  expand_limits(x = 0) +
+  labs(
+    title = "Who is represented in the CS2 sample?",
+    subtitle = "Top 10 country codes by number of distinct players",
+    x = "Share of records with a known country code (%)",
+    y = NULL
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(legend.position = "top")
+
+print(idea5_rep_plot)
 
