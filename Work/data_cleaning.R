@@ -23,7 +23,7 @@ cs <- cs[!is.na(cs$team1) & !is.na(cs$team2), ]
 cs <- cs[!grepl("Esports Nations Cup", cs$tournament), ]
 
 # deleting russian tournaments
-ru_pattern <- "BetBoom|Buster|Games Future|Игры Будущего|России|студенческая лига|Сбера|WINLINE|PARI, PLEASE|Open киберспортивные|VK GG|LanDaLan|CIS|Evelone|Rofl|Streamers League|FISSURE"
+ru_pattern <- "Moscow|BetBoom|Buster|Games Future|Игры Будущего|России|студенческая лига|Сбера|WINLINE|PARI, PLEASE|Open киберспортивные|VK GG|LanDaLan|CIS|Evelone|Rofl|Streamers League|FISSURE"
 ru <- grepl(ru_pattern, cs$tournament, ignore.case = TRUE)
 length(unique(cs$tournament[ru]))   
 sum(ru)                            
@@ -77,7 +77,7 @@ nrow(maps)
 #then we sort by map_name so that without map name would be first
 #and will be dleted by !duplicate
 #only those without map name are true summaries
-matches <- matches[order(matches$match_id, !is.na(matches$map_name),]
+matches <- matches[order(matches$match_id, !is.na(matches$map_name)), ]
 matches <- matches[!duplicated(matches$match_id),]
 nrow(matches)
 
@@ -116,7 +116,7 @@ players <- wide |> pivot_longer(
 )
 #AI suggested the pattern with () and .value feature
 # + corrected syntaxis
-
+players <- players |> filter(!is.na(name), !is.na(adr))
 
 players <- players |> mutate(
   team = ifelse(side == '1', team1, team2),
