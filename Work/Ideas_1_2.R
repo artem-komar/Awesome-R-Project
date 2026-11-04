@@ -2,6 +2,7 @@
 library(tidyverse)
 library(ggthemes)
 library(here)
+library(ggplot2)
 
 # Loading datasets
 cs <- read.csv(here("data", "cs2_all_tiers_games.csv"), encoding = "UTF-8", na.strings = c("", "NA"))
@@ -78,7 +79,7 @@ nrow(maps)
 #then we sort by map_name so that without map name would be first
 #and will be dleted by !duplicate
 #only those without map name are true summaries
-matches <- matches[order(matches$match_id, !is.na(matches$map_name),]
+matches <- matches[order(matches$match_id, !is.na(matches$map_name)),]
 matches <- matches[!duplicated(matches$match_id),]
 nrow(matches)
 
@@ -264,7 +265,8 @@ idea1.2 <- by_diff |> ggplot(aes(
             )
 #AI suggested adding by diff df to show the amount of maps with different round diffs
 #I have created the plot
-
+ggsave(here('Output', 'Idea1.1.png'), idea1.1, width = 10, height = 6, dpi = 300)
+ggsave(here('Output', 'Idea1.2.png'), idea1.2, width = 10, height = 6, dpi = 300)
 
 ## IDEA 2 ----
 maps <- maps |> mutate(
@@ -286,3 +288,4 @@ idea2 <- mappool |> ggplot(aes(
 )) + geom_tile(color = 'white', linewidth = 0.2) + 
   geom_text(aes(label = ifelse(share != 0, round(share, 0), '')), size = 3) + 
   scale_fill_gradient(low = '#f9f0ec', high = '#50C878') + theme_minimal() + labs(title = "CS2 map pool by quarter", x = NULL, y = NULL)
+ggsave(here('Output', 'Idea2.png'), idea2, width = 10, height = 6, dpi = 300)
