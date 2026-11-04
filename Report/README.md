@@ -53,8 +53,9 @@ Let's move to the ideas that we apply to our project:
 - count overtime rate for every map: games with more than 24 rounds / all games on the map * 100%
   
 **Tools:**
-  
+
 **Status:**
+
 
 ---
 
@@ -96,3 +97,52 @@ Let's move to the ideas that we apply to our project:
 
 **Status:**
 
+
+---
+## Data Cleaning Process
+
+Raw data is big and a bit messy: there are not only pro games, some names are written in different ways and some maps are not real games. So before any analysis we clean it in the script 01_data_cleaning.R. Order of the steps is important, we do the filters first and only then build the tables.
+
+### 1. Loading and tiers
+
+We read three csv files: all games, Tier 1 games and Tier 2 games. Tier of every game is made by the tournament name: if tournament is in the Tier 1 list it is tier1, if in the Tier 2 list it is tier2, all other is tier3 (unique(), %in%, ifelse()).
+
+### 2. Filters
+
+| What we remove | How we find it |
+|---|---|
+| Rows without team names | is.na() on team1 and team2 |
+| National teams tournament | grepl("Esports Nations Cup", ...) |
+| Russian regional tournaments | big regex pattern with names (BetBoom, Buster, VK GG, CIS and others), grepl(..., ignore.case = TRUE) |
+| Non-professional tournaments and showmatches | regex pattern (Showmatch, Impact League, Friday Fight, Star Series, IESF and others) |
+| All-star teams (Team USA, Team Germany, BLAST Dream Team...) | team names in a list, %in%, we delete the game if one of two teams is in the list |
+| Games before October 2023 | as.POSIXct() and filter by date, because pro games in CS2 started from October 2023 |
+
+Before deleting Russian tournaments we check how many tournaments and rows will go away (length(unique(...)), sum()), so we know that filter works not too strong.
+
+### 3. Team names
+
+Same team can be written in different ways ("BETBOOM TEAM" and "BetBoom Team", "WICKED" and "Wicked Gaming"). We made a named vector fix_names and the function fix_team() that changes wrong names to the right one (ifelse()).
+
+### 4. Matches and maps
+
+Data has two types of rows, so we divide it by the column is_total:
+
+- **matches** (is_total == "True") - only the result of the whole match. We sort by match_id and drop duplicates (order(), duplicated()). Some team1_win values are wrong, so we count the winner again from the match score.
+- **maps** (is_total == "False") - every map separately. We drop maps without score and technical losses: real map must have winner with 13 or more rounds (pmax() >= 13).
+
+### 5. Table of players
+
+Original table has 10 columns for players (team1_player1 ... team2_player5) in one row. With pivot_longer() and regex in names_pattern we make the table where **one row = one player on one map**. After this:
+
+- we drop rows without player name or without ADR
+- we add columns: team, opponent, rounds_won, rounds_lost, win (ifelse())
+- we take nickname and country from the name string like r1nkle (Artem Moroz), UA (sub(), grepl(), substr(), trimws())
+
+### 6. Table of team maps
+
+With group_by() and summarise() we make the table where **one row = one team on one map**: number of players, mean ADR, SD of ADR, mean KAST and win. Then we add adr_cv (SD / mean * 100), round_diff and full_team (team has all 5 players). By left_join() we take the mean ADR of the opponent and count adr_diff. Column both_full shows that both teams have 5 players, we use only such maps in the ideas about ADR, because with missing player the mean and SD are not fair.
+
+### 7. Map numbers and BO3 checks
+
+For every match we count the number of the map and amount of maps (row_number(), n()), find the winner of the first and the second map and join it to matches (left_join()). Then we make the flags maps_complete, order_ok and bo3_ok. They help to keep only normal BO3 matches, where all maps are in the data and the order is correct. It is used in the idea about comebacks.
