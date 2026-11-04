@@ -125,10 +125,10 @@ ggplot(regulars, aes(x = adr_mean, y = kast_mean)) +
 ##AI assisted with Recommending linear model residuals (resid(lm())) and 1 SD thresholds to classify player archetypes without k-means, also
 # suggesting arrange() and head(10) logic to isolate top positive/negative outlier players and 
 #advising to place color mapping inside geom_point() instead of global aes() to keep a single geom_smooth() regression line.
-# Збереження графіків для Ідеї 4
+#images for idea 4
 ggsave(here('Output', 'Idea4.png'), width = 10, height = 6, dpi = 300)
 ggsave(here('Output', 'Idea4.1.png'), width = 10, height = 6, dpi = 300)
 
-# Збереження графіків для Ідеї 6
+#images for idea 6
 ggsave(here('Output', 'Idea6.png'), width = 10, height = 6, dpi = 300)
 ggsave(here('Output', 'Idea6.1.png'), width = 10, height = 6, dpi = 300)
