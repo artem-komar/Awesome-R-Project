@@ -15,7 +15,7 @@ cv_mean = mean(adr_cv), cv_median = median(adr_cv))
 balance |> group_by(tier, win) |> summarise(maps = n(), cv_mean = mean(adr_cv), .groups = "drop")
 
 # the density plot
-ggplot(balance, aes(x = adr_cv, fill = factor(win))) +
+p4<-ggplot(balance, aes(x = adr_cv, fill = factor(win))) +
 geom_density(alpha = 0.5) +
 scale_fill_manual(values = c("0" = "#d65a2a", "1" = "#2a78d6"),
 labels = c("Lost the map", "Won the map"),name = NULL) +
@@ -24,6 +24,7 @@ subtitle = "CV of ADR between 5 players of the team (higher = more uneven)",
 x = "CV of team ADR, %", y = "Density", caption = paste(nrow(balance) / 2, "maps")) +theme_minimal(base_size = 13) +
 theme(legend.position = "top")
 
+ggsave(here('Output', 'Idea4.png'), plot = p4, width = 10, height = 6, dpi = 300)
 ##AI suggested the paste() method for combining values into a string. 
 
 # winner vs loser of the same map
@@ -46,7 +47,7 @@ summarise(maps = n(), even_share = mean(winner_more_even) * 100)
 by_diff_cv$diff_group <- factor(by_diff_cv$diff_group, levels = c("2", "3", "4", "5", "6", "7", "8+"))
 by_diff_cv
 # the col plot
-ggplot(by_diff_cv, aes(x = diff_group, y = even_share)) +
+p4_1<-ggplot(by_diff_cv, aes(x = diff_group, y = even_share)) +
 geom_col(fill = "#2a78d6", width = 0.7) +
 geom_hline(yintercept = 50, linetype = "dashed") +
 geom_text(aes(label = paste(round(even_share, 1), "%")), vjust = -0.3, size = 5) +
@@ -56,6 +57,7 @@ subtitle = "Share of maps where winner had lower ADR CV than opponent",
 x = "Round diff (+)", y = "Share of maps, %",
 caption = paste(nrow(paired), "maps")) +
 theme_minimal(base_size = 13)
+ggsave(here('Output', 'Idea4.1.png'), plot = p4_1, width = 10, height = 6, dpi = 300)
 
 ##AI suggested to establish limitations for even_share by ylim(0,70) and also 
 ##suggested adding a dashed baseline at y = 50% (geom_hline) 
@@ -80,7 +82,7 @@ ggplot(players, aes(x = adr, y = kast)) +geom_point(alpha = 0.1, size = 1, color
        x = "ADR", y = "KAST, %",
        caption = paste(nrow(players), "player-maps")) +
   theme_minimal(base_size = 13)
-
+ggsave(here('Output', 'Idea6.png'), width = 10, height = 6, dpi = 300)
 ##AI suggested implementing geom_smooth(method = "lm") to display 
 ## the linear regression trend line and visualize the overall direction of the ADR vs KAST relationship 
 
@@ -122,13 +124,8 @@ ggplot(regulars, aes(x = adr_mean, y = kast_mean)) +
        caption = paste(nrow(regulars), "players")) +
   theme_minimal(base_size = 13) +
   theme(legend.position = "top")
+ggsave(here('Output', 'Idea6.1.png'), width = 10, height = 6, dpi = 300)
 ##AI assisted with Recommending linear model residuals (resid(lm())) and 1 SD thresholds to classify player archetypes without k-means, also
 # suggesting arrange() and head(10) logic to isolate top positive/negative outlier players and 
 #advising to place color mapping inside geom_point() instead of global aes() to keep a single geom_smooth() regression line.
-#images for idea 4
-ggsave(here('Output', 'Idea4.png'), width = 10, height = 6, dpi = 300)
-ggsave(here('Output', 'Idea4.1.png'), width = 10, height = 6, dpi = 300)
 
-#images for idea 6
-ggsave(here('Output', 'Idea6.png'), width = 10, height = 6, dpi = 300)
-ggsave(here('Output', 'Idea6.1.png'), width = 10, height = 6, dpi = 300)
